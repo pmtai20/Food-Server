@@ -15,25 +15,40 @@ app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// simple route
-app.get("/", (req, res) => {
-    res.json(
-        [
-            {
-                id: 1,
-                name: "Le Long"
-            },
-            {
-                id: 2,
-                name: "Nguyen Hoai An"
-            }
 
-        ]
-    );
+app.get('/', function (req, res) {
+
+    var sql = require("mssql");
+
+    // config for your database
+    var config = {
+        user: 'admin',
+        password: 'admin',
+        server: 'localhost',
+        database: 'QLNH',
+        trustServerCertificate: true
+    };
+
+    // connect to your database
+    sql.connect(config, function (err) {
+
+        if (err) console.log(err);
+
+        // create Request object
+        var request = new sql.Request();
+
+        // query to the database and get the records
+        request.query('select * from KHACHHANG', function (err, recordset) {
+
+            if (err) console.log(err)
+
+            // send records as a response
+            res.send(recordset);
+
+        });
+    });
 });
 
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
+app.listen(5000, function () {
+    console.log('Server is running..');
 });
